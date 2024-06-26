@@ -1,12 +1,14 @@
 from UI.Error_Window import ErrWindow
 from Application.Foodics_Orders import Foodics_Orders
 from Application.SAP_Orders import SAP_Orders
+from Data_Access.Analysis_Result import Analysis_Result
 
 class TransactionsAnalysis:
     def __init__(self):
         self.errwindow = ErrWindow()
         self.food_orders = Foodics_Orders()
         self.sap_orders = SAP_Orders()
+        self.analysis_result = Analysis_Result()
 
     def PrepareFoodicsAnalysis(self, authURL=""):
         self.food_orders.PrepareFoodicsTransactions(authURL)
@@ -32,19 +34,18 @@ class TransactionsAnalysis:
         except Exception as e:
             ErrWindow.show_error(f"An unexpected error occurred: {e}. {transaction_name}")
 
-    def OrderAnalysis(self, transaction_type, foodics_status=1):
-        transaction_name = "unknown"
+    def OrderAnalysis(self, sap_transaction_type, foodics_status=1):
+        transaction_type = "unknown"
         if foodics_status == 4:
-            transaction_name = "Foodics_Orders"
+            transaction_type = "Orders"
         elif foodics_status == 5:
-            transaction_name = "Return"
+            transaction_type = "Return"
 
         try:
             foodics_orders = self.food_orders.GetOrders(foodics_status)
-            unsorted_SAP_order = self.sap_orders.Get_Orders(transaction_type)
+            unsorted_SAP_order = self.sap_orders.Get_Orders(sap_transaction_type)
             sorted_SAP_order = unsorted_SAP_order.sort_values(by='Foodics Ref')
-            non_matching_orders = self.NoneMatchingTransactions(foodics_orders, sorted_SAP_order, transaction_name)
-            print(non_matching_orders)
-            return non_matching_orders
+            non_matching_orders = self.NoneMatchingTransactions(foodics_orders, sorted_SAP_order, transaction_type)
+            self.analysis_result.Store_Result(non_matching_orders, transaction_type)
         except Exception as e:
-            self.errwindow.show_error(f"An unexpected error occurred: {e}. {transaction_name}")
+            self.errwindow.show_error(f"An unexpected error occurred: {e}. {transaction_type}")

@@ -36,7 +36,7 @@ class Foodics_Orders:
             if not orders_extracted_data:
                 orders_extracted_data = [{'id': None, 'reference': None, 'business_date': None}]
 
-            orders_data_frame = pd.DataFrame(orders_extracted_data)
+            orders_data_frame = pd.DataFrame(orders_data_json['data'])
             return orders_data_frame
 
         except Exception as e:
