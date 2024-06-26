@@ -1,6 +1,6 @@
 import sys
 from UI.Error_Window import ErrWindow
-from Storage.FoodicsAPIMethods import FoodAPIMethods
+from Storage.Foodics_API_Methods import FoodAPIMethods
 
 
 class FoodicsTransaction:
